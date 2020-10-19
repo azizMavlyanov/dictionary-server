@@ -6,7 +6,9 @@ let url = require('url');
 let dictionary = null;
 
 let dictionaryHandler = (request, response) => {
-    let u = url.parse(request.url);
+    let decodedUrl = decodeURI(request.url);
+    let u = url.parse(decodedUrl);
+    
 
     if (u.pathname == '/readyz') {
         if (dictionary) {
@@ -19,9 +21,22 @@ let dictionaryHandler = (request, response) => {
         return;
     }
 
+    if (u.pathname == '/mindmap') {
+
+        fs.readFile("./mindmap.png", function (err,data) {
+            if (err) {
+                response.writeHead(404);
+                response.end(JSON.stringify(err));
+              return;
+            }
+            response.writeHead(200, {'Content-Type': 'image/png' });
+            response.end(data)});
+            return;
+    }
+
     let key = '';
     if (u.pathname.length > 0) {
-        key = u.pathname.substr(1).toUpperCase(); 
+        key = u.pathname.substr(1).toLowerCase(); 
     }
     let def = dictionary[key];
     if (!def) {
@@ -29,7 +44,7 @@ let dictionaryHandler = (request, response) => {
         response.end(key + ' was not found');
         return;
     }
-    response.writeHead(200);
+    response.writeHead(200, {'Content-Type': 'text/plain; charset=utf-8'});
     response.end(def);
 }
 
