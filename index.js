@@ -8,8 +8,9 @@ let dictionary = null;
 let dictionaryHandler = (request, response) => {
     let decodedUrl = decodeURI(request.url);
     let u = url.parse(decodedUrl);
-    
 
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    
     if (u.pathname == '/readyz') {
         if (dictionary) {
             response.writeHead(200);
